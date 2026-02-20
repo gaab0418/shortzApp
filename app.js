@@ -45,4 +45,9 @@ sequelize
 	.then(() => console.log('Banco OK'))
 	.catch((err) => console.error('Erro no banco: ', err));
 
+sequelize
+	.sync({ alter: true })
+	.then(() => console.log('Banco sincronizado'))
+	.catch((err) => console.error('Erro no banco: ', err));
+
 module.exports = app;

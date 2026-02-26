@@ -39,6 +39,7 @@ app.use(function (err, req, res, next) {
 });
 
 const sequelize = require('./config/database');
+const user = require('./modules/user/user');
 
 sequelize
 	.authenticate()

@@ -12,7 +12,9 @@ const sequelize = new Sequelize(
 		logging: false,
 		define: {
 			timestamps: true,
-			underscored: true
+			createdAt: 'createdAt',
+			updatedAt: 'updatedAt',
+			deletedAt: 'deletedAt'
 		}
 	}
 );

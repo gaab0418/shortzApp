@@ -1,230 +1,224 @@
-# **Plano de Teste — Shortz-App**
 
-## **1\. Identificação**
+```markdown
+# **Plano de Teste — Shortz-App (21 Cenários Críticos)**
 
+## **1. Identificação**
 * **Projeto:** Shortz-App  
 * **Versão:** 1.0
 * **Grupo:** Gabriel Chiarelli; Gabriel Vinicius Batista; Marcelo Filho; Vinicius Pollnow; Raoni Zardo
-* **Data de criação:** 10/03/2026  
-* **Objetivo:** Garantir que as funcionalidades de cadastro, autenticação, upload e feed funcionem conforme os requisitos de negócio e padrões de segurança, detectando falhas precocemente antes da entrega.
+* **Data:** 10/03/2026  
+* **Objetivo:** Garantir cadastro, autenticação, upload, feed e admin conforme RN/RF da especificação.
 
-## **2\. Escopo**
+## **2. Escopo**
+**SERÁ testado:** Cadastro (RN-001), Login (RN-002), Upload vídeo (RN-004), Feed (RN-007), Likes/comentários (RN-006), Admin (RN-012)  
+**NÃO será:** Performance, acessibilidade, cross-browser
 
-### **O que SERÁ testado**
+## **3. Estratégia**
+**Unitários:** Validações (email, senha, duração vídeo)  
+**Integração:** Rotas `/register`, `/login`, `/videos/upload`, middleware auth  
+**Ferramentas:** Vitest, Supertest, GitHub Actions
 
-* Cadastro e login de usuários (validação de campos e autenticação).  
-* Edição de perfil e regras de armazenamento de dados sensíveis.  
-* Upload de vídeos e verificação de restrições (tamanho, formato e tempo).  
-* Funcionalidades do feed (priorizado e global) e interações (curtidas e comentários).  
-* Acessos ao painel administrativo.
-
-## **3\. Estratégia**
-
-### **Níveis de Teste**
-
-* **Unitários:** Funções de validação de dados, hashing de senha, formatação de e-mail e regras de negócio limitadoras de tempo de vídeo.  
-* **Integração:** Rotas de autenticação (`/register`, `/login`), uploads no multer (`/videos/upload`) e proteção de rotas privadas.
-
-### **Ferramentas que podem ser utilizadas**
-
-* `Vitest`, `Supertest`, `c8/coverage`, `GitHub Actions`
-
-## **4\. Riscos Identificados**
+## **4. Riscos e Cenários (21 Críticos)**
 
 | ID | Descrição | Categoria | Prob. | Impacto | Prioridade |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| R-01 | Senha armazenada em texto plano | Não-Funcional (Segurança) | Alta | Crítico | Crítica |
-| R-02 | Upload de vídeo aceitando .exe | Funcional/Segurança | Alta | Crítico | Crítica |
-| R-03 | Banco indisponível derruba app inteira | Técnico | Média | Alto | Alta |
-| R-04 | E-mail inválido passa no cadastro | Funcional | Alta | Alto | Alta |
-| R-05 | Botão curtir permite cliques múltiplos | Funcional | Alta | Médio | Média |
-| R-06 | Rota admin acessível sem login | Não-Funcional (Segurança) | Média | Crítico | Crítica |
-| R-07 | Comentário executando HTML/Script (XSS) | Não-Funcional (Segurança) | Alta | Crítico | Crítica |
-| R-08 | Sistema aceita vídeos de 2 minutos | Funcional/Negócio | Média | Médio | Média |
-| R-09 | Feed fallback mostra dados errados | Funcional | Baixa | Alto | Média |
-| R-10 | Foto de perfil gigante não retorna erro | Técnico | Alta | Baixo | Baixa |
+|----|-----------|-----------|-------|---------|------------|
+| R01 | Senha texto plano no MySQL | Segurança | Alta | Crítico | **Crítica** |
+| R02 | Upload aceita .exe | Segurança | Alta | Crítico | **Crítica** |
+| R03 | Banco offline = crash | Técnico | Média | Alto | **Alta** |
+| R04 | Email "teste123" válido | Funcional | Alta | Alto | **Alta** |
+| R05 | Likes duplicam (race cond.) | Funcional | Alta | Médio | **Média** |
+| R06 | `/admin` sem login | Segurança | Média | Crítico | **Crítica** |
+| R07 | XSS em comentários | Segurança | Alta | Crítico | **Crítica** |
+| R08 | Vídeo 2min aceito | Negócio | Média | Médio | **Média** |
+| R09 | Feed novo user vazio | UX | Baixa | Alto | **Média** |
+| R10 | Foto perfil 50MB OK | Técnico | Alta | Baixo | **Baixa** |
+| R11 | Sessão expira sem aviso | Usabilidade | Alta | Alto | **Alta** |
+| R12 | Username duplicado | Funcional | Média | Alto | **Alta** |
+| R13 | Foto 4000x4000 sem resize | Performance | Alta | Médio | **Média** |
+| R14 | Logout deixa cookies | Segurança | Média | Crítico | **Crítica** |
+| R15 | Feed vaza vídeo privado | Privacidade | Baixa | Crítico | **Alta** |
+| R16 | Busca mostra deletados | Funcional | Média | Médio | **Média** |
+| R17 | Like duplo aceito | Funcional | Alta | Médio | **Média** |
+| R18 | Playlist duplicatas | Funcional | Média | Baixo | **Baixa** |
+| R19 | Streaming sem range 206 | Performance | Alta | Alto | **Alta** |
+| R20 | Views contam no hover | Negócio | Média | Médio | **Média** |
+| R21 | Delete user deixa órfãos | Integridade | Média | Crítico | **Crítica** |
 
-### **Detalhamento dos Erros (Tópicos de Defeitos Simulados)**
+---
 
-#### **R-1\. Senha não guardada com criptografia**
-
-* **Como ocorre:** O servidor salva diretamente do req.body sem aplicar a biblioteca bcrypt.  
+### **R01: Senha texto plano**
 ```js
-  const createUser = async (req, res) => {  
-    const { email, password } = req.body;  
-    // Falha aqui: Não houve hash da senha antes de salvar  
-    const newUser = await User.create({ email, password });  
-    res.status(201).json(newUser);  
-  };
+await User.create({email, password}); // Sem bcrypt.hash()
 ```
+**Reproduzir:** Cadastro → `SELECT password FROM users`  
+**Impacto:** Todas senhas vazam em dump SQL  
+**Prioridade:** Crítica (RN-011)
 
-* **O que ele afeta:** Segurança de credenciais dos usuários.  
-* **Sua Gravidade:** Crítico  
-* **Como reproduzir:** Cadastre um usuário com senha "123456", acesse o MySQL no Workbench e olhe a coluna password na tabela Users.  
-* **Impacto:** Vazamento de banco de dados resulta em total exposição das senhas dos usuários.  
-* **Categoria:** Não-Funcional (Segurança)  
-* **Sistema Referência:** Módulo de Autenticação / Banco de Dados
-
-#### **R-2\. Upload com falha aceitando arquivos maliciosos**
-
-* **Como ocorre:** O middleware do multer não filtra o tipo (mimetype) do arquivo submetido.  
+### **R02: Upload .exe**
 ```js
-  // Sem fileFilter definido  
-  const upload = multer({ dest: 'uploads/videos/' });   
-  router.post('/upload', upload.single('video'), videoController.create);
+multer({dest:'uploads/'}); // Sem fileFilter
 ```
+**Reproduzir:** `virus.exe` no upload vídeo  
+**Impacto:** RCE servidor  
+**Prioridade:** Crítica (RN-004)
 
-* **O que ele afeta:** Integridade do Servidor e Segurança de Arquivos.  
-* **Sua Gravidade:** Crítico  
-* **Como reproduzir:** Acesse a tela de upload de vídeo, selecione um arquivo virus.exe e clique em enviar.  
-* **Impacto:** Permite que atacantes façam upload de malwares (RCE) comprometendo o servidor inteiro.  
-* **Categoria:** Funcional / Segurança  
-* **Sistema Referencia:** Upload de Vídeo (Multer)
-
-#### **R-3\. Banco de dados indisponível (Crash sem tratamento)**
-
-* **Como ocorre:** As requisições ao banco não utilizam bloco try/catch para capturar exceções de conexão.  
+### **R03: Banco offline crash**
 ```js
-  const getFeed = async (req, res) => {  
-    // Falta o try/catch. Se o banco falhar, o Node vai crashar (Unhandled Promise Rejection)  
-    const videos = await Video.findAll();   
-    res.render('home', { videos });  
-  };
-  ```
-
-* **O que ele afeta:** Disponibilidade do Shortz-App.  
-* **Sua Gravidade:** Alto  
-* **Como reproduzir:** Pare o serviço do MySQL localmente e tente dar F5 na página inicial.  
-* **Impacto:** O servidor desliga em vez de mostrar uma tela de erro "Tente novamente mais tarde", derrubando a navegação para todos.  
-* **Categoria:** Técnico  
-* **Sistema Referência:** Conexão Database / Feed Global
-
-#### **R-4\. E-mail inválido cadastrando normalmente**
-
-* **Como ocorre:** A validação confere apenas se a string existe, mas não verifica o formato padrão (@ e domínio). 
-```js
-  const { email } = req.body;  
-  if (!email) {  
-    return res.status(400).send("Email obrigatório");  
-  }  
-  // Falta Regex verificando o formato de email  
-  next();
-  ```
-
-* **O que ele afeta:** Consistência da base e comunicação com o usuário.  
-* **Sua Gravidade:** Alto  
-* **Como reproduzir:** Na tela /register, digite "teste123" no campo de e-mail e clique em cadastrar.  
-* **Impacto:** Usuário cria uma conta mas nunca conseguirá recuperar a senha, e o sistema acumula lixo na base de dados.  
-* **Categoria:** Funcional  
-* **Sistema Referência:** Formulário de Cadastro / Validação de Request
-
-#### **R-5\. Contador de curtidas duplicando (Race Condition)**
-
-* **Como ocorre:** Requisições rápidas incrementam o valor local sem travar (lock) a leitura na tabela. 
-```js 
-  const video = await Video.findByPk(req.params.id);  
-  // Incremento local vulnerável a múltiplas requisições simultâneas  
-  video.likesCount++;   
-  await video.save();
-  ```
-
-* **O que ele afeta:** Veracidade dos dados e estatísticas do vídeo.  
-* **Sua Gravidade:** Médio  
-* **Como reproduzir:** Use uma ferramenta como Postman para enviar 10 requisições POST para `/vídeos/1/like` no exato mesmo milissegundo.  
-* **Impacto:** O vídeo ganha curtidas artificialmente distorcendo o algoritmo de relevância.  
-* **Categoria:** Funcional  
-* **Sistema Referência:** Interação de Likes em Vídeos
-
-#### **R-6\. Rota administrativa totalmente exposta**
-
-* **Como ocorre:** O mapeamento das rotas admin foi feito sem middleware de controle de sessão.
-```js  
-  // app.use(authMiddleware, adminRoutes); -> O que deveria ser feito  
-  app.use('/admin', adminRoutes); // Como está codificado
-  ```
-
-* **O que ele afeta:** Permissões do sistema e privacidade de dados.  
-* **Sua Gravidade:** Crítico  
-* **Como reproduzir:** Abra uma aba anônima (sem estar logado) e digite localhost:3000/admin/users.  
-* **Impacto:** Visitantes anônimos ganham privilégios para banir perfis e deletar qualquer vídeo do Shortz-App.  
-* **Categoria:** Não-Funcional (Segurança)  
-* **Sistema Referência:** Painel Administrativo
-
-#### **R-7\. Injeção de Scripts em comentários**
-
-* **Como ocorre:** Uso equivocado de tags de renderização no frontend (`<%- %>` em vez de `<%= %>`). 
-```js 
-  <div class="comment-body">  
-    <!-- Renderização sem escape de HTML -->  
-    <% comment.text %>   
-  </div>
-  ```
-
-* **O que ele afeta:** Segurança do cliente e do frontend (Navegador).  
-* **Sua Gravidade:** Crítico  
-* **Como reproduzir:** No campo de comentário de um vídeo, digite 
-`<script>alert('Hack')</script>` e poste. Recarregue a página do vídeo.  
-* **Impacto:** Quando outros usuários abrirem o vídeo, o script roda no computador deles, podendo roubar tokens de sessão.  
-* **Categoria:** Não-Funcional (Segurança)  
-* **Sistema Referencia:** Comentários / Engine EJS
-
-#### **R-8\. Vídeos com mais de 1 minuto passando no upload**
-
-* **Como ocorre:** O servidor verifica o "tamanho" do arquivo (bytes), mas ignora a validação do "tempo" de duração do metadado do vídeo.  
-```js
-  if (req.file.size > 50000000) {  
-    return res.status(400).send("Arquivo muito pesado");  
-  }  
-  // Falta a validação: if (videoDuration > 60) return erro;
+const videos = await Video.findAll(); // Sem try/catch
 ```
+**Reproduzir:** `systemctl stop mysql` → F5 home  
+**Impacto:** Node crash 500 todos users  
+**Prioridade:** Alta
 
-* **O que ele afeta:** Regra de negócio núcleo ("Shorts").  
-* **Sua Gravidade:** Médio  
-* **Como reproduzir:** Faça upload de um vídeo de baixa resolução, com `2MB` de tamanho, mas que tenha 3 minutos de duração.  
-* **Impacto:** Desconfigura o propósito principal do aplicativo (vídeos curtos) prejudicando o fluxo dinâmico do Feed.  
-* **Categoria:** Funcional / Negócio  
-* **Sistema Referência:** Regras de Upload de Vídeo
-
-#### **R-9\. Feed Priorizado Vazio gera Fallback incorreto**
-
-* **Como ocorre:** Se o usuário não segue ninguém, o sistema deveria listar o feed Global, mas lista apenas vídeos de si mesmo.  
-  ```js
-  const following = await getFollowing(userId);  
-  if (following.length === 0) {  
-    // Deveria ser Video.findAll() global (ordenado por recente)  
-    return await Video.findAll({ where: { userId } });  
-  }
-  ```
-
-* **O que ele afeta:** Descoberta de conteúdo para novos usuários (Cold Start).  
-* **Sua Gravidade:** Alto  
-* **Como reproduzir:** Crie um perfil novo. Não siga ninguém e acesse a aba "Home/Feed". Estará totalmente vazia.  
-* **Impacto:** Alto risco de evasão. Um usuário novo achará que a rede não tem conteúdo e vai desinstalar/abandonar.  
-* **Categoria:** Funcional  
-* **Sistema Referência:** Algoritmo do Feed e Home
-
-#### **R-10\. Erro silencioso em Upload de Imagem de Perfil**
-
-* **Como ocorre:** Não há limite definido na instância do Multer e a falha de estourar a memória acontece sem resposta ao cliente.  
+### **R04: Email inválido**
 ```js
-  const uploadProfile = multer({ dest: 'uploads/profiles/' });   
-  // O Multer tenta engolir arquivos de 100MB e ocorre timeout sem JSON de erro.
+if(!email) return 400; // "teste123@passa"
 ```
- **O que ele afeta:** Usabilidade e Tráfego de Rede.  
-* **Sua Gravidade:** Baixo  
-* **Como reproduzir:** Tente atualizar a foto do perfil com uma imagem `.tiff` de `30MB`.  
-* **Impacto:** O site ficará carregando até dar timeout, gerando uma experiência confusa. O usuário não sabe se o erro foi da rede dele ou da imagem.  
-* **Categoria:** Técnico / Usabilidade  
-* **Sistema Referência:** Edição de Perfil
+**Reproduzir:** `/register` email="abc"  
+**Impacto:** User sem recovery senha  
+**Prioridade:** Alta (RN-001)
 
-## **5\. Recursos e Ambiente**
+### **R05: Likes duplicam**
+```js
+video.likesCount++; await video.save(); // Race condition
+```
+**Reproduzir:** 10 POST `/like` simultâneos  
+**Impacto:** Métricas falsas  
+**Prioridade:** Média (RN-006)
 
-* **Ambiente:** Node.js 20+, MySQL local, Vitest + Supertest  
-* **Dados de teste:** Mock de usuários em arquivos `.json` e vídeos falsos para validação do multer criados no `tests/fixtures/`.  
-* **CI:** GitHub Actions (npm test em cada push)
+### **R06: Admin público**
+```js
+app.use('/admin', adminRoutes); // Sem auth
+```
+**Reproduzir:** `/admin/users` sem login  
+**Impacto:** Qualquer um deleta tudo  
+**Prioridade:** Crítica (RN-012)
 
-## **6\. Critérios de Entrada e Saída**
+### **R07: XSS comentários**
+```ejs
+<%- comment.text %> <!-- Executa script -->
+```
+**Reproduzir:** `<script>alert('XSS')</script>`  
+**Impacto:** Rouba cookies visitantes  
+**Prioridade:** Crítica (RN-006)
 
-* **Entrada:** Ambiente configurado + migration ok + build passando  
-* **Saída:** Cobertura ≥ 70% + zero falhas em riscos Críticos/Altos  
-* **Suspensão:** Falha grave no ambiente que impede execução dos testes, como falha de persistência no MySQL de testes.
+### **R08: Vídeo 2min**
+```js
+if(file.size > 50MB); // Ignora duração
+```
+**Reproduzir:** Upload 2min (2MB)  
+**Impacto:** Quebra "shorts" conceito  
+**Prioridade:** Média (RN-004)
+
+### **R09: Feed novo user vazio**
+```js
+if(!following) return userVideos; // Errado!
+```
+**Reproduzir:** User novo → home vazia  
+**Impacto:** 90% churn primeiro login  
+**Prioridade:** Média (RN-007)
+
+### **R10: Foto 50MB**
+```js
+multer({dest:'profiles/'}); // Sem limits
+```
+**Reproduzir:** Foto perfil 50MB  
+**Impacto:** Disco cheio  
+**Prioridade:** Baixa (RN-003)
+
+### **R11: Sessão expira**
+```js
+jwt.sign({exp: '1h'}); // Sem refresh
+```
+**Reproduzir:** Login → 1h30 → curtir  
+**Impacto:** UX quebrada  
+**Prioridade:** Alta (RN-002)
+
+### **R12: Username duplicado**
+```js
+await User.create(data); // CHECK tarde
+```
+**Reproduzir:** 2x mesmo username  
+**Impacto:** Perfis colidem  
+**Prioridade:** Alta (RN-001)
+
+### **R13: Foto sem resize**
+```js
+fs.writeFile(dest, buffer); // 4000x4000
+```
+**Reproduzir:** Foto 5MB → `uploads/profiles/`  
+**Impacto:** Performance ruim  
+**Prioridade:** Média (RN-003)
+
+### **R14: Logout cookies**
+```js
+req.session.destroy(); // Sem clearCookie
+```
+**Reproduzir:** Login→logout→DevTools  
+**Impacto:** CSRF risco  
+**Prioridade:** Crítica (RF-003)
+
+### **R15: Feed vaza privados**
+```js
+Video.findAll({userId: following}); // Sem isPublic
+```
+**Reproduzir:** Vídeo privado no feed  
+**Impacto:** Privacidade violada  
+**Prioridade:** Alta (RN-007)
+
+### **R16: Busca deletados**
+```js
+Video.findAll({title: '%query%'}); // Sem deletedAt
+```
+**Reproduzir:** Delete → busca título  
+**Impacto:** Conteúdo fantasma  
+**Prioridade:** Média (RN-016)
+
+### **R17: Like duplo**
+```js
+Like.create({userId, videoId}); // Sem UNIQUE
+```
+**Reproduzir:** ❤️ 2x rápido  
+**Impacto:** Contador inflado  
+**Prioridade:** Média (RN-006)
+
+### **R18: Playlist duplicatas**
+```js
+PlaylistVideo.create({playlistId, videoId});
+```
+**Reproduzir:** Mesmo vídeo 2x playlist  
+**Impacto:** UX confusa  
+**Prioridade:** Baixa (RN-008)
+
+### **R19: Streaming sem range**
+```js
+res.sendFile(videoPath); // Sempre 200
+```
+**Reproduzir:** Vídeo 50MB → seek 80%  
+**Impacto:** Rede ineficiente  
+**Prioridade:** Alta (RN-005)
+
+### **R20: Views no hover**
+```js
+video.views++; // Thumbnail = view
+```
+**Reproduzir:** Scroll feed sem play  
+**Impacto:** Métricas falsas  
+**Prioridade:** Média (RN-005)
+
+### **R21: User delete órfãos**
+```js
+User.destroy({id}); // Sem CASCADE
+```
+**Reproduzir:** Admin deleta user+videos  
+**Impacto:** GBs disco vazados  
+**Prioridade:** Crítica (RN-012)
+
+## **5. Recursos**
+* **Ambiente:** Node 20+, MySQL, Docker  
+* **CI:** GitHub Actions `npm test`
+
+## **6. Critérios**
+**Entrada:** Migration OK, build passando  
+**Saída:** 70% coverage, 0 falhas Críticas  
+**Suspensão:** MySQL offline, build quebrado

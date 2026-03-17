@@ -4,19 +4,20 @@ const userController = require('../modules/user/userController');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-	res.render('index', { title: 'Express' });
+	res.render('index', { title: 'Vídeos Curtos e Engajadores' });
 });
 
 /* GET register page. */
-router.get('/register', function (req, res, next) {
-	res.render('register', { title: 'Registre-se', messages: {} });
+router.get('/register', (req, res) => {
+	res.render('register', { title: 'Criar Conta' });
 });
 
-/* GET login page. */
-router.get('/login', function (req, res, next) {
-	res.render('login', { title: 'Entrar', messages: {} });
-});
-
+// Rota que processa o formulário de cadastro
 router.post('/register', userController.register);
+
+// Rota para exibir o formulário de login
+router.get('/login', (req, res) => {
+	res.render('login', { title: 'Entrar' });
+});
 
 module.exports = router;

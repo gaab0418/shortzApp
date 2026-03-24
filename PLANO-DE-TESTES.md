@@ -1,465 +1,410 @@
 # **Plano de Teste — Shortz-App**
 
-## **1\. Identificação**
+## **1. Identificação**
 
-- **Projeto:** Shortz-App
-- **Versão:** 1.0
-- **Grupo:** Gabriel Chiarelli; Gabriel Vinicius Batista; Marcelo Filho; Vinicius Pollnow; Raoni Zardo
-- **Data de criação:** 10/03/2026
-- **Objetivo:** Garantir que as funcionalidades de cadastro, autenticação, upload e feed funcionem conforme os requisitos de negócio e padrões de segurança, detectando falhas precocemente antes da entrega.
+* **Projeto:** Shortz-App  
+* **Versão:** 1.0
+* **Grupo:** Gabriel Chiarelli; Gabriel Vinicius Batista; Marcelo Filho; Vinicius Pollnow; Raoni Zardo
+* **Data de criação:** 10/03/2026  
+* **Objetivo:** Garantir que as funcionalidades de cadastro, autenticação, upload e feed funcionem conforme os requisitos de negócio e padrões de segurança, detectando falhas precocemente antes da entrega.
 
-## **2\. Escopo**
+## **2. Escopo dos Testes**
 
-### **O que SERÁ testado**
+### **2.1. Em Escopo (O que SERÁ testado)**
 
-- Cadastro e login de usuários (validação de campos e autenticação).
-- Edição de perfil e regras de armazenamento de dados sensíveis.
-- Upload de vídeos e verificação de restrições (tamanho, formato e tempo).
-- Funcionalidades do feed (priorizado e global) e interações (curtidas e comentários).
-- Acessos ao painel administrativo.
+* Cadastro e login de usuários (validação de campos e autenticação).  
+* Edição de perfil e regras de armazenamento de dados sensíveis.  
+* Upload de vídeos e verificação de restrições (tamanho, formato e tempo).  
+* Funcionalidades do feed (priorizado e global) e interações (curtidas e comentários).  
+* Acessos ao painel administrativo.
 
-## **3\. Estratégia**
+### **2.2. Fora de Escopo**
 
-### **Níveis de Teste**
+* Testes de carga, estresse e desempenho em larga escala.
+* Testes de compatibilidade em múltiplos dispositivos ou navegadores específicos.
+* Integrações com serviços de terceiros (redes sociais externas).
 
-- **Unitários:** Funções de validação de dados, hashing de senha, formatação de e-mail e regras de negócio limitadoras de tempo de vídeo.
-- **Integração:** Rotas de autenticação (`/register`, `/login`), uploads no multer (`/videos/upload`) e proteção de rotas privadas.
+## **3. Estratégia de Testes**
 
-### **Ferramentas que podem ser utilizadas**
+Nossa estratégia de testes é fundamentada no conceito de **Shift-Left Testing**, que preconiza a integração das atividades de teste o mais cedo possível no ciclo de desenvolvimento. Isso nos permite identificar e corrigir defeitos de forma proativa, reduzindo custos e tempo de retrabalho. 
 
-- `Vitest`, `Supertest`, `c8/coverage`, `GitHub Actions`
+A estrutura segue e orienta a proporção dos tipos de teste baseada na **Pirâmide de Testes**:
 
-## **4\. Riscos Identificados**
+1. **Testes Unitários:** Constituem a base da pirâmide, focando na validação de unidades mínimas de código, validando funções isoladas como validação de dados, hashing de senhas, formatação de e-mail e regras de negócio limitadoras.
+2. **Testes de Integração:** Localizados no meio da pirâmide, garantem a comunicação eficaz entre diferentes módulos. São aplicados nas rotas de autenticação (`/register`, `/login`), middlewares de upload do multer (`/videos/upload`), proteção de rotas privadas e interações com banco de dados.
+3. **Testes Black-Box (Sistema/E2E):** No topo da pirâmide, estes testes simulam o comportamento do usuário final sem necessidade de conhecimento do código interno, validando fluxos completos da aplicação através de técnicas de análise sistemática.
 
-| ID   | Descrição                                | Categoria                   | Prob. | Impacto | Prioridade |
-| :--- | :--------------------------------------- | :-------------------------- | :---- | :------ | :--------- |
-| R-01 | Senha armazenada em texto plano          | Não-Funcional (Segurança)   | Alta  | Crítico | Crítica    |
-| R-02 | Upload de vídeo aceitando .exe           | Funcional/Segurança         | Alta  | Crítico | Crítica    |
-| R-03 | Banco indisponível derruba app inteira   | Técnico                     | Média | Alto    | Alta       |
-| R-04 | E-mail inválido passa no cadastro        | Funcional                   | Alta  | Alto    | Alta       |
-| R-05 | Botão curtir permite cliques múltiplos   | Funcional                   | Alta  | Médio   | Média      |
-| R-06 | Rota admin acessível sem login           | Não-Funcional (Segurança)   | Média | Crítico | Crítica    |
-| R-07 | Comentário executando HTML/Script (XSS)  | Não-Funcional (Segurança)   | Alta  | Crítico | Crítica    |
-| R-08 | Sistema aceita vídeos de 2 minutos       | Funcional/Negócio           | Média | Médio   | Média      |
-| R-09 | Feed fallback mostra dados errados       | Funcional                   | Baixa | Alto    | Média      |
-| R-10 | Foto de perfil gigante não retorna erro  | Técnico                     | Alta  | Baixo   | Baixa      |
-| R-11 | Sessão JWT expira sem refresh token      | Não-Funcional (Usabilidade) | Alta  | Alto    | Alta       |
-| R-12 | Username duplicado aceito no cadastro    | Funcional                   | Média | Alto    | Alta       |
-| R-13 | Foto de perfil sem redimensionamento     | Técnico / Performance       | Alta  | Médio   | Média      |
-| R-14 | Logout não limpa cookies do navegador    | Não-Funcional (Segurança)   | Média | Crítico | Crítica    |
-| R-15 | Feed exibe vídeos privados de outros     | Não-Funcional (Privacidade) | Baixa | Crítico | Alta       |
-| R-16 | Busca retorna conteúdo já deletado       | Funcional                   | Média | Médio   | Média      |
-| R-17 | Like duplicado aceito sem constraint     | Funcional                   | Alta  | Médio   | Média      |
-| R-18 | Mesmo vídeo adicionado 2x na playlist    | Funcional                   | Média | Baixo   | Baixa      |
-| R-19 | Streaming sem suporte a HTTP Range (206) | Técnico / Performance       | Alta  | Alto    | Alta       |
-| R-20 | Visualização conta no hover sem play     | Funcional / Negócio         | Média | Médio   | Média      |
-| R-21 | Deleção de usuário deixa dados órfãos    | Não-Funcional (Integridade) | Média | Crítico | Crítica    |
+### **Ferramentas utilizadas**
+* `Vitest` para estruturação e execução de testes automatizados (unitários e de integração). 
+* `Supertest` para simular as requisições na API HTTP.
+* `c8/coverage` para geração de relatórios de cobertura do código.
+* `GitHub Actions` para CI/CD (Integração e automação).
+
+## **4. Análise de Riscos e Mitigação**
+
+A identificação e gestão de riscos são cruciais para priorizar os esforços de teste. Agora, mapeamos exatamente **12 Riscos Críticos (R-01 a R-12)** para que batam perfeitamente (1:1) com nossa modelagem **Black-Box**.
+
+| ID | Descrição | Categoria | Prob. | Impacto | Prioridade | Estratégia de Mitigação |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| R-01 | Senha armazenada em texto plano | Segurança | Alta | Crítico | Crítica | Testes de integração na camada auth para validar que ela use hash via bcrypt ANTES de salvar no DB. |
+| R-02 | Upload de vídeo aceitando .exe | Func/Segurança | Alta | Crítico | Crítica | Análise de Limite e Particionamento no middleware multer para validação de MIME-type e extensão permitidas (MP4/MOV). |
+| R-03 | Banco indisponível derruba app inteira | Técnico | Média | Alto | Alta | Testes simulando falha de instanciamento do MySQL e garantindo exception segura (`try/catch`). |
+| R-04 | E-mail inválido passa no cadastro | Funcional | Alta | Alto | Alta | Testes unitários utilizando classes inválidas e regex na requisição para bloqueio imediato com HTTP 400. |
+| R-05 | Contador de curtidas duplicando | Funcional | Alta | Médio | Média | Teste de estresse simples (Race Condition) acionando requisições em paralelo e verificando contagem única. |
+| R-06 | Rota admin acessível sem login | Segurança | Média | Crítico | Crítica | Testes Black-box simulando usuário não-autorizado que tenta alcançar as endpoints de admin (Retorno esperado 401/403). |
+| R-07 | Comentário executando Script (XSS) | Segurança | Alta | Crítico | Crítica | Envio de injeção de payload maliciosa simples `<script>alert(1)</script>` para validar eficácia da sanitização EJS/Backend. |
+| R-08 | Sistema aceita vídeos > 60 segundos | Negócio | Média | Médio | Média | Aplicação de Análise de Valor-Limite enviando dados de duração no metadata extrapolando a regra (e.g., 61s). |
+| R-09 | Feed fallback mostra dados errados | Funcional | Baixa | Alto | Média | Testes integrados para cold start: Usuário recém criado exibindo últimos posts gerais ao invés de tela em branco. |
+| R-10 | Erro silencioso em arquivo gigante | Técnico | Alta | Baixo | Baixa | Forçar upload de imagem pesada para perfil e rastrear presença de JSON legível de log erro em vez do server calar. |
+| R-11 | Cadastro permite senhas muito curtas | Segurança | Alta | Alto | Alta | Validar via Equivalência recusa de senhas com menos de 8 caracteres exigidos pelo app. |
+| R-12 | Vídeo Privado exposto publicamente | Func/Privacidade | Alta | Crítico | Crítica | Aplicar Tabela de Decisão pra impedir exposição cruzada via views a menos que o flag de permissão do DB aprove. |
 
 ### **Detalhamento dos Erros (Tópicos de Defeitos Simulados)**
 
-#### **R-1\. Senha não guardada com criptografia**
+#### **R-1. Senha não guardada com criptografia**
 
-- **Como ocorre:** O servidor salva diretamente do req.body sem aplicar a biblioteca bcrypt.
-
+* **Como ocorre:** O servidor salva diretamente do req.body sem aplicar a biblioteca bcrypt.  
 ```js
-const createUser = async (req, res) => {
-	const { email, password } = req.body;
-	// Falha aqui: Não houve hash da senha antes de salvar
-	const newUser = await User.create({ email, password });
-	res.status(201).json(newUser);
-};
+  const createUser = async (req, res) => {  
+    const { email, password } = req.body;  
+    // Falha aqui: Não houve hash da senha antes de salvar  
+    const newUser = await User.create({ email, password });  
+    res.status(201).json(newUser);  
+  };
 ```
 
-- **O que ele afeta:** Segurança de credenciais dos usuários.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Cadastre um usuário com senha "123456", acesse o MySQL no Workbench e olhe a coluna password na tabela Users.
-- **Impacto:** Vazamento de banco de dados resulta em total exposição das senhas dos usuários.
-- **Categoria:** Não-Funcional (Segurança)
-- **Sistema Referência:** Módulo de Autenticação / Banco de Dados
+* **O que ele afeta:** Segurança de credenciais dos usuários.  
+* **Sua Gravidade:** Crítico  
+* **Como reproduzir:** Cadastre um usuário com senha "123456", acesse o MySQL no Workbench e olhe a coluna password na tabela Users.  
+* **Impacto:** Vazamento de banco de dados resulta em total exposição das senhas dos usuários.  
+* **Categoria:** Não-Funcional (Segurança)  
+* **Sistema Referência:** Módulo de Autenticação / Banco de Dados
 
-#### **R-2\. Upload com falha aceitando arquivos maliciosos**
+#### **R-2. Upload com falha aceitando arquivos maliciosos**
 
-- **Como ocorre:** O middleware do multer não filtra o tipo (mimetype) do arquivo submetido.
-
+* **Como ocorre:** O middleware do multer não filtra o tipo (mimetype) do arquivo submetido.  
 ```js
-// Sem fileFilter definido
-const upload = multer({ dest: 'uploads/videos/' });
-router.post('/upload', upload.single('video'), videoController.create);
+  // Sem fileFilter definido  
+  const upload = multer({ dest: 'uploads/videos/' });   
+  router.post('/upload', upload.single('video'), videoController.create);
 ```
 
-- **O que ele afeta:** Integridade do Servidor e Segurança de Arquivos.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Acesse a tela de upload de vídeo, selecione um arquivo virus.exe e clique em enviar.
-- **Impacto:** Permite que atacantes façam upload de malwares (RCE) comprometendo o servidor inteiro.
-- **Categoria:** Funcional / Segurança
-- **Sistema Referencia:** Upload de Vídeo (Multer)
+* **O que ele afeta:** Integridade do Servidor e Segurança de Arquivos.  
+* **Sua Gravidade:** Crítico  
+* **Como reproduzir:** Acesse a tela de upload de vídeo, selecione um arquivo virus.exe e clique em enviar.  
+* **Impacto:** Permite que atacantes façam upload de malwares (RCE) comprometendo o servidor inteiro.  
+* **Categoria:** Funcional / Segurança  
+* **Sistema Referencia:** Upload de Vídeo (Multer)
 
-#### **R-3\. Banco de dados indisponível (Crash sem tratamento)**
+#### **R-3. Banco de dados indisponível (Crash sem tratamento)**
 
-- **Como ocorre:** As requisições ao banco não utilizam bloco try/catch para capturar exceções de conexão.
-
+* **Como ocorre:** As requisições ao banco não utilizam bloco try/catch para capturar exceções de conexão.  
 ```js
-const getFeed = async (req, res) => {
-	// Falta o try/catch. Se o banco falhar, o Node vai crashar (Unhandled Promise Rejection)
-	const videos = await Video.findAll();
-	res.render('home', { videos });
-};
+  const getFeed = async (req, res) => {  
+    // Falta o try/catch. Se o banco falhar, o Node vai crashar (Unhandled Promise Rejection) ou causar erro silencioso
+    const videos = await Video.findAll();   
+    res.render('home', { videos });  
+  };
 ```
 
-- **O que ele afeta:** Disponibilidade do Shortz-App.
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Pare o serviço do MySQL localmente e tente dar F5 na página inicial.
-- **Impacto:** O servidor desliga em vez de mostrar uma tela de erro "Tente novamente mais tarde", derrubando a navegação para todos.
-- **Categoria:** Técnico
-- **Sistema Referência:** Conexão Database / Feed Global
+* **O que ele afeta:** Disponibilidade do Shortz-App.  
+* **Sua Gravidade:** Alto  
+* **Como reproduzir:** Pare o serviço do MySQL localmente e tente dar F5 na página inicial.  
+* **Impacto:** O servidor desliga em vez de mostrar uma tela de erro "Tente novamente mais tarde", derrubando a navegação para todos.  
+* **Categoria:** Técnico  
+* **Sistema Referência:** Conexão Database / Feed Global
 
-#### **R-4\. E-mail inválido cadastrando normalmente**
+#### **R-4. E-mail inválido cadastrando normalmente**
 
-- **Como ocorre:** A validação confere apenas se a string existe, mas não verifica o formato padrão (@ e domínio).
-
+* **Como ocorre:** A validação confere apenas se a string existe, mas não verifica o formato padrão (@ e domínio). 
 ```js
-const { email } = req.body;
-if (!email) {
-	return res.status(400).send('Email obrigatório');
-}
-// Falta Regex verificando o formato de email
-next();
+  const { email } = req.body;  
+  if (!email) {  
+    return res.status(400).send("Email obrigatório");  
+  }  
+  // Falta Regex verificando o formato de email  
+  next();
 ```
 
-- **O que ele afeta:** Consistência da base e comunicação com o usuário.
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Na tela /register, digite "teste123" no campo de e-mail e clique em cadastrar.
-- **Impacto:** Usuário cria uma conta mas nunca conseguirá recuperar a senha, e o sistema acumula lixo na base de dados.
-- **Categoria:** Funcional
-- **Sistema Referência:** Formulário de Cadastro / Validação de Request
+* **O que ele afeta:** Consistência da base e comunicação com o usuário.  
+* **Sua Gravidade:** Alto  
+* **Como reproduzir:** Na tela /register, digite "teste123" no campo de e-mail e clique em cadastrar.  
+* **Impacto:** Usuário cria uma conta mas nunca conseguirá recuperar a senha, e o sistema acumula lixo na base de dados.  
+* **Categoria:** Funcional  
+* **Sistema Referência:** Formulário de Cadastro / Validação de Request
 
-#### **R-5\. Contador de curtidas duplicando (Race Condition)**
+#### **R-5. Contador de curtidas duplicando (Race Condition)**
 
-- **Como ocorre:** Requisições rápidas incrementam o valor local sem travar (lock) a leitura na tabela.
-
-```js
-const video = await Video.findByPk(req.params.id);
-// Incremento local vulnerável a múltiplas requisições simultâneas
-video.likesCount++;
-await video.save();
+* **Como ocorre:** Requisições rápidas incrementam o valor local sem travar (lock) a leitura na tabela. 
+```js 
+  const video = await Video.findByPk(req.params.id);  
+  // Incremento local vulnerável a múltiplas requisições simultâneas  
+  video.likesCount++;   
+  await video.save();
 ```
 
-- **O que ele afeta:** Veracidade dos dados e estatísticas do vídeo.
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Use uma ferramenta como Postman para enviar 10 requisições POST para `/vídeos/1/like` no exato mesmo milissegundo.
-- **Impacto:** O vídeo ganha curtidas artificialmente distorcendo o algoritmo de relevância.
-- **Categoria:** Funcional
-- **Sistema Referência:** Interação de Likes em Vídeos
+* **O que ele afeta:** Veracidade dos dados e estatísticas do vídeo.  
+* **Sua Gravidade:** Médio  
+* **Como reproduzir:** Use uma ferramenta como Postman para enviar 10 requisições POST para `/vídeos/1/like` no exato mesmo milissegundo.  
+* **Impacto:** O vídeo ganha curtidas artificialmente distorcendo o algoritmo de relevância.  
+* **Categoria:** Funcional  
+* **Sistema Referência:** Interação de Likes em Vídeos
 
-#### **R-6\. Rota administrativa totalmente exposta**
+#### **R-6. Rota administrativa totalmente exposta**
 
-- **Como ocorre:** O mapeamento das rotas admin foi feito sem middleware de controle de sessão.
-
-```js
-// app.use(authMiddleware, adminRoutes); -> O que deveria ser feito
-app.use('/admin', adminRoutes); // Como está codificado
+* **Como ocorre:** O mapeamento das rotas admin foi feito sem middleware de controle de sessão.
+```js  
+  // app.use(authMiddleware, adminRoutes); -> O que deveria ser feito  
+  app.use('/admin', adminRoutes); // Como está codificado
 ```
 
-- **O que ele afeta:** Permissões do sistema e privacidade de dados.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Abra uma aba anônima (sem estar logado) e digite localhost:3000/admin/users.
-- **Impacto:** Visitantes anônimos ganham privilégios para banir perfis e deletar qualquer vídeo do Shortz-App.
-- **Categoria:** Não-Funcional (Segurança)
-- **Sistema Referência:** Painel Administrativo
+* **O que ele afeta:** Permissões do sistema e privacidade de dados.  
+* **Sua Gravidade:** Crítico  
+* **Como reproduzir:** Abra uma aba anônima (sem estar logado) e digite localhost:3000/admin/users.  
+* **Impacto:** Visitantes anônimos ganham privilégios para banir perfis e deletar qualquer vídeo do Shortz-App.  
+* **Categoria:** Não-Funcional (Segurança)  
+* **Sistema Referência:** Painel Administrativo
 
-#### **R-7\. Injeção de Scripts em comentários**
+#### **R-7. Injeção de Scripts em comentários**
 
-- **Como ocorre:** Uso equivocado de tags de renderização no frontend (`<%- %>` em vez de `<%= %>`).
-
-```js
-  <div class="comment-body">
-    <!-- Renderização sem escape de HTML -->
-    <% comment.text %>
+* **Como ocorre:** Uso equivocado de tags de renderização no frontend (`<%- %>` em vez de `<%= %>`). 
+```js 
+  <div class="comment-body">  
+    <!-- Renderização sem escape de HTML -->  
+    <% comment.text %>   
   </div>
 ```
 
-- **O que ele afeta:** Segurança do cliente e do frontend (Navegador).
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** No campo de comentário de um vídeo, digite
-  `<script>alert('Hack')</script>` e poste. Recarregue a página do vídeo.
-- **Impacto:** Quando outros usuários abrirem o vídeo, o script roda no computador deles, podendo roubar tokens de sessão.
-- **Categoria:** Não-Funcional (Segurança)
-- **Sistema Referencia:** Comentários / Engine EJS
+* **O que ele afeta:** Segurança do cliente e do frontend (Navegador).  
+* **Sua Gravidade:** Crítico  
+* **Como reproduzir:** No campo de comentário de um vídeo, digite `<script>alert('Hack')</script>` e poste. Recarregue a página do vídeo.  
+* **Impacto:** Quando outros usuários abrirem o vídeo, o script roda no computador deles, podendo roubar tokens de sessão.  
+* **Categoria:** Não-Funcional (Segurança)  
+* **Sistema Referencia:** Comentários / Engine EJS
 
-#### **R-8\. Vídeos com mais de 1 minuto passando no upload**
+#### **R-8. Vídeos com mais de 1 minuto passando no upload**
 
-- **Como ocorre:** O servidor verifica o "tamanho" do arquivo (bytes), mas ignora a validação do "tempo" de duração do metadado do vídeo.
-
+* **Como ocorre:** O servidor verifica o "tamanho" do arquivo (bytes), mas ignora a validação do "tempo" de duração do metadado do vídeo.  
 ```js
-if (req.file.size > 50000000) {
-	return res.status(400).send('Arquivo muito pesado');
-}
-// Falta a validação: if (videoDuration > 60) return erro;
+  if (req.file.size > 50000000) {  
+    return res.status(400).send("Arquivo muito pesado");  
+  }  
+  // Falta a validação: if (videoDuration > 60) return erro;
 ```
 
-- **O que ele afeta:** Regra de negócio núcleo ("Shorts").
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Faça upload de um vídeo de baixa resolução, com `2MB` de tamanho, mas que tenha 3 minutos de duração.
-- **Impacto:** Desconfigura o propósito principal do aplicativo (vídeos curtos) prejudicando o fluxo dinâmico do Feed.
-- **Categoria:** Funcional / Negócio
-- **Sistema Referência:** Regras de Upload de Vídeo
+* **O que ele afeta:** Regra de negócio núcleo ("Shorts").  
+* **Sua Gravidade:** Médio  
+* **Como reproduzir:** Faça upload de um vídeo de baixa resolução, com `2MB` de tamanho, mas que tenha 3 minutos de duração.  
+* **Impacto:** Desconfigura o propósito principal do aplicativo (vídeos curtos) prejudicando o fluxo dinâmico do Feed.  
+* **Categoria:** Funcional / Negócio  
+* **Sistema Referência:** Regras de Upload de Vídeo
 
-#### **R-9\. Feed Priorizado Vazio gera Fallback incorreto**
+#### **R-9. Feed Priorizado Vazio gera Fallback incorreto**
 
-- **Como ocorre:** Se o usuário não segue ninguém, o sistema deveria listar o feed Global, mas lista apenas vídeos de si mesmo.
-
-    ```js
-    const following = await getFollowing(userId);
-    if (following.length === 0) {
-    	// Deveria ser Video.findAll() global (ordenado por recente)
-    	return await Video.findAll({ where: { userId } });
-    }
-    ```
-
-- **O que ele afeta:** Descoberta de conteúdo para novos usuários (Cold Start).
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Crie um perfil novo. Não siga ninguém e acesse a aba "Home/Feed". Estará totalmente vazia.
-- **Impacto:** Alto risco de evasão. Um usuário novo achará que a rede não tem conteúdo e vai desinstalar/abandonar.
-- **Categoria:** Funcional
-- **Sistema Referência:** Algoritmo do Feed e Home
-
-#### **R-10\. Erro silencioso em Upload de Imagem de Perfil**
-
-- **Como ocorre:** Não há limite definido na instância do Multer e a falha de estourar a memória acontece sem resposta ao cliente.
-
+* **Como ocorre:** Se o usuário não segue ninguém, o sistema deveria listar o feed Global, mas lista apenas vídeos de si mesmo.  
 ```js
-const uploadProfile = multer({ dest: 'uploads/profiles/' });
-// O Multer tenta engolir arquivos de 100MB e ocorre timeout sem JSON de erro.
+  const following = await getFollowing(userId);  
+  if (following.length === 0) {  
+    // Deveria ser Video.findAll() global (ordenado por recente)  
+    return await Video.findAll({ where: { userId } });  
+  }
 ```
 
-- **O que ele afeta:** Usabilidade e Tráfego de Rede.
-- **Sua Gravidade:** Baixo
-- **Como reproduzir:** Tente atualizar a foto do perfil com uma imagem `.tiff` de `30MB`.
-- **Impacto:** O site ficará carregando até dar timeout, gerando uma experiência confusa. O usuário não sabe se o erro foi da rede dele ou da imagem.
-- **Categoria:** Técnico / Usabilidade
-- **Sistema Referência:** Edição de Perfil
+* **O que ele afeta:** Descoberta de conteúdo para novos usuários (Cold Start).  
+* **Sua Gravidade:** Alto  
+* **Como reproduzir:** Crie um perfil novo. Não siga ninguém e acesse a aba "Home/Feed". Estará totalmente vazia.  
+* **Impacto:** Alto risco de evasão. Um usuário novo achará que a rede não tem conteúdo e vai desinstalar/abandonar.  
+* **Categoria:** Funcional  
+* **Sistema Referência:** Algoritmo do Feed e Home
 
-#### **R-11\. Sessão JWT expira sem mecanismo de refresh**
+#### **R-10. Erro silencioso em Upload de Imagem de Perfil**
 
-- **Como ocorre:** O token JWT é gerado com expiração fixa de 1 hora e não há implementação de refresh token para renovar a sessão automaticamente.
-
+* **Como ocorre:** Não há limite definido na instância do Multer e a falha de estourar a memória acontece sem resposta ao cliente.  
 ```js
-const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: '1h' });
-// Não existe endpoint /refresh-token nem lógica de renovação automática
-res.json({ token });
+  const uploadProfile = multer({ dest: 'uploads/profiles/' });   
+  // O Multer tenta engolir arquivos de 100MB e ocorre timeout sem JSON de erro.
 ```
 
-- **O que ele afeta:** Experiência do usuário durante uso prolongado.
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Faça login normalmente, aguarde 1h30 e tente curtir um vídeo ou postar um comentário. A requisição retornará 401 Unauthorized.
-- **Impacto:** O usuário é deslogado abruptamente no meio de uma ação, perdendo contexto e gerando frustração. Em sessões longas de navegação, isso se repete constantemente.
-- **Categoria:** Não-Funcional (Usabilidade)
-- **Sistema Referência:** Módulo de Autenticação / JWT
+* **O que ele afeta:** Usabilidade e Tráfego de Rede.  
+* **Sua Gravidade:** Baixo  
+* **Como reproduzir:** Tente atualizar a foto do perfil com uma imagem `.tiff` de `30MB`.  
+* **Impacto:** O site ficará carregando até dar timeout, gerando uma experiência confusa. O usuário não sabe se o erro foi da rede dele ou da imagem.  
+* **Categoria:** Técnico / Usabilidade  
+* **Sistema Referência:** Edição de Perfil
 
-#### **R-12\. Username duplicado aceito no cadastro**
-
-- **Como ocorre:** O sistema tenta criar o usuário diretamente no banco sem verificar previamente se o username já existe, confiando apenas na constraint do banco que pode gerar erro não tratado.
-
+#### **R-11. Cadastro permite senhas muito curtas**
+* **Como ocorre:** A rota de `/register` não impõe limite mínimo de 8 caracteres no corpo da requisição.
 ```js
-const registerUser = async (req, res) => {
-	const { username, email, password } = req.body;
-	// Falta: const exists = await User.findOne({ where: { username } });
-	const newUser = await User.create({ username, email, password });
-	res.status(201).json(newUser);
-};
+  if (!password) return res.status(400).send("Senha vazia");  
+  // Faltou validação: if (password.length < 8) return erro;
+  const hash = await bcrypt.hash(password, 10);
 ```
+* **O que ele afeta:** Segurança de Força Bruta contra a conta.
+* **Sua Gravidade:** Alto
+* **Como reproduzir:** Tente cadastrar usando a senha "123".  
+* **Impacto:** Contas vulneráveis a ataques de dicionário ou brute-force.
+* **Categoria:** Funcional / Segurança
+* **Sistema Referência:** Validação de Registro
 
-- **O que ele afeta:** Unicidade dos perfis e identificação dos usuários.
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Cadastre dois usuários diferentes com o mesmo username (ex: "joao123") em abas separadas quase simultaneamente.
-- **Impacto:** Perfis com o mesmo username colidem, causando confusão na busca e nas menções. Se não houver UNIQUE no banco, ambos são criados; se houver, o erro 500 não é tratado graciosamente.
-- **Categoria:** Funcional
-- **Sistema Referência:** Formulário de Cadastro / Validação de Unicidade
-
-#### **R-13\. Foto de perfil sem redimensionamento automático**
-
-- **Como ocorre:** O servidor salva a imagem de perfil no tamanho original enviado pelo usuário, sem aplicar resize antes de armazenar.
-
+#### **R-12. Privacidade violada (Vídeo Privado Exposto)**
+* **Como ocorre:** A query do banco que resgata vídeos de um perfil não filtra pelo campo `isPrivate`.
 ```js
-const updateAvatar = async (req, res) => {
-	// Salva o buffer direto sem processar com sharp/jimp
-	fs.writeFileSync(`uploads/profiles/${req.file.filename}`, req.file.buffer);
-	// Imagem de 4000x4000px fica armazenada sem redimensionamento
-};
+  // Resgata tudo do userId, sem ocultar os "private: true" para terceiros
+  const userVideos = await Video.findAll({ where: { userId: openProfileId } });
 ```
+* **O que ele afeta:** Privacidade do usuário ativo.
+* **Sua Gravidade:** Crítico
+* **Como reproduzir:** Usuário "A" posta vídeo Privado. Usuário "B" acessa perfil do User "A" e consegue reproduzir.
+* **Impacto:** Constrangimento e quebra severa dos direitos de privacidade.
+* **Categoria:** Segurança / Permissões
+* **Sistema Referência:** Query de Feed e Consulta de Perfis
 
-- **O que ele afeta:** Performance de carregamento e consumo de disco/banda.
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Faça upload de uma foto de perfil com resolução 4000x4000 pixels (~5MB). Verifique no diretório `uploads/profiles/` que o arquivo mantém o tamanho original.
-- **Impacto:** Páginas de perfil e listagens de comentários ficam lentas ao carregar avatares gigantes, consumindo banda desnecessária dos usuários.
-- **Categoria:** Técnico / Performance
-- **Sistema Referência:** Edição de Perfil / Upload de Imagem
+## **5. Modelagem de Testes (Técnicas Black-Box)**
 
-#### **R-14\. Logout não limpa cookies do navegador**
+Nesta seção, aplicamos as técnicas de modelagem Black-Box exigidas por rubrica para garantir que os limites do sistema e as regras de negócio sejam rigorosamente validados. Cada funcionalidade crítica foi analisada com a técnica mais adequada, conectando diretamente com os 12 Riscos catalogados na seção anterior.
 
-- **Como ocorre:** A rota de logout destrói a sessão no servidor mas não envia instrução para o navegador limpar o cookie de sessão.
+---
 
-```js
-const logout = (req, res) => {
-	req.session.destroy();
-	// Falta: res.clearCookie('connect.sid');
-	res.redirect('/login');
-};
-```
+### **5.1. Upload de Vídeos — Particionamento de Equivalência e Análise de Valores-Limite**
+**Riscos cobertos:** R-02 (arquivo proibido), R-08 (duração > 60s), R-10 (arquivo gigante)
 
-- **O que ele afeta:** Segurança de sessão pós-logout.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Faça login, depois logout. Abra o DevTools (F12) → Application → Cookies e verifique que o cookie `connect.sid` ainda existe no navegador.
-- **Impacto:** Um atacante com acesso físico ao computador pode reutilizar o cookie para acessar a sessão. Também abre brecha para ataques CSRF pós-logout.
-- **Categoria:** Não-Funcional (Segurança)
-- **Sistema Referência:** Módulo de Autenticação / Gerenciamento de Sessão
+**Regra:** O arquivo do upload deve ser um vídeo no formato MP4 ou MOV, ter duração máxima de 1 minuto (60 segundos) e tamanho entre 1 MB e 50 MB.
 
-#### **R-15\. Feed exibe vídeos privados de outros usuários**
+| Campo | Classe Válida | Classes Inválidas |
+| :--- | :--- | :--- |
+| **Duração** | 1 a 60 segundos | < 1 segundo; > 60 segundos |
+| **Tamanho** | 1 MB a 50 MB | < 1 MB; > 50 MB |
+| **Formato** | .mp4, .mov | .exe, .jpg, .pdf, .txt, .avi |
 
-- **Como ocorre:** A query do feed busca todos os vídeos dos usuários seguidos sem filtrar pelo campo `isPublic`.
+**Análise de Valores-Limite (Duração):**
 
-```js
-const getFeed = async (req, res) => {
-	const following = await getFollowing(req.user.id);
-	// Falta: where: { userId: following, isPublic: true }
-	const videos = await Video.findAll({ where: { userId: following } });
-	res.render('feed', { videos });
-};
-```
+| Limite | Valor Mínimo (1s) | Abaixo do Mín. | Valor Máximo (60s) | Acima do Máx. |
+| :--- | :--- | :--- | :--- | :--- |
+| **Valores Teste** | 1s | 0s | 60s | 61s |
 
-- **O que ele afeta:** Privacidade dos criadores de conteúdo.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Crie um vídeo marcado como privado. Peça para outro usuário que te segue acessar o feed e verifique que o vídeo privado aparece normalmente.
-- **Impacto:** Vídeos que o criador marcou como privados (rascunhos, conteúdo pessoal) ficam expostos no feed de seus seguidores, violando a expectativa de privacidade.
-- **Categoria:** Não-Funcional (Privacidade)
-- **Sistema Referência:** Algoritmo do Feed / Query de Vídeos
+**Análise de Valores-Limite (Tamanho do Arquivo):**
 
-#### **R-16\. Busca retorna conteúdo já deletado**
+| Limite | Valor Mínimo (1 MB) | Abaixo do Mín. | Valor Máximo (50 MB) | Acima do Máx. |
+| :--- | :--- | :--- | :--- | :--- |
+| **Valores Teste** | 1 MB | 0.5 MB | 50 MB | 51 MB |
 
-- **Como ocorre:** A query de busca por título não filtra registros com soft-delete (campo `deletedAt` preenchido).
+---
 
-```js
-const searchVideos = async (req, res) => {
-	const { query } = req.query;
-	// Falta: where: { title: { [Op.like]: `%${query}%` }, deletedAt: null }
-	const results = await Video.findAll({
-		where: { title: { [Op.like]: `%${query}%` } }
-	});
-	res.json(results);
-};
-```
+### **5.2. Cadastro de Usuário — Particionamento de Equivalência e Valores-Limite**
+**Riscos cobertos:** R-04 (e-mail inválido), R-11 (senha curta)
 
-- **O que ele afeta:** Consistência dos resultados de busca.
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Publique um vídeo, depois delete-o. Use a busca pelo título do vídeo deletado e verifique que ele ainda aparece nos resultados.
-- **Impacto:** Usuários encontram vídeos "fantasmas" nos resultados de busca que ao clicar retornam erro 404, degradando a confiança na plataforma.
-- **Categoria:** Funcional
-- **Sistema Referência:** Motor de Busca / Query de Vídeos
+**Regra:** O e-mail deve conter formato válido (`usuario@dominio.com`). A senha deve ter no mínimo 8 caracteres.
 
-#### **R-17\. Like duplicado aceito sem constraint UNIQUE**
+| Campo | Classe Válida | Classes Inválidas |
+| :--- | :--- | :--- |
+| **E-mail** | usuario@dominio.com | "teste123" (sem @); "@dominio.com" (sem user); "user@" (sem domínio) |
+| **Senha** | 8 ou mais caracteres (ex: "Abc12345") | "" (vazia); "123" (3 chars); "1234567" (7 chars) |
 
-- **Como ocorre:** A tabela de likes não possui constraint UNIQUE na combinação (userId, videoId), permitindo múltiplos registros de curtida.
+**Análise de Valores-Limite (Comprimento da Senha):**
 
-```js
-const likeVideo = async (req, res) => {
-	// Falta verificação: const existing = await Like.findOne({ where: { userId, videoId } });
-	await Like.create({ userId: req.user.id, videoId: req.params.id });
-	res.json({ success: true });
-};
-```
+| Limite | Abaixo do Mín. | Valor Mínimo (8) | Acima do Mínimo |
+| :--- | :--- | :--- | :--- |
+| **Valores Teste** | 7 caracteres | 8 caracteres | 9 caracteres |
 
-- **O que ele afeta:** Integridade das métricas de engajamento.
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Clique no botão de curtir duas vezes rapidamente em um vídeo. Verifique na tabela `likes` que foram criados dois registros para o mesmo par (userId, videoId).
-- **Impacto:** Contadores de likes ficam inflados artificialmente, distorcendo o ranqueamento de vídeos no feed e a percepção de popularidade.
-- **Categoria:** Funcional
-- **Sistema Referência:** Interação de Likes / Modelo de Dados
+---
 
-#### **R-18\. Mesmo vídeo adicionado múltiplas vezes na playlist**
+### **5.3. Interação de Curtidas — Particionamento de Equivalência**
+**Risco coberto:** R-05 (curtida duplicada / Race Condition)
 
-- **Como ocorre:** A rota de adicionar vídeo à playlist não verifica se o vídeo já existe naquela playlist antes de inserir.
+**Regra:** Cada usuário só pode registrar 1 curtida por vídeo. Clicar novamente deve remover a curtida (toggle/unlike).
 
-```js
-const addToPlaylist = async (req, res) => {
-	const { playlistId, videoId } = req.body;
-	// Falta: const exists = await PlaylistVideo.findOne({ where: { playlistId, videoId } });
-	await PlaylistVideo.create({ playlistId, videoId });
-	res.json({ success: true });
-};
-```
+| Estado Atual | Ação do Usuário | Resultado Esperado |
+| :--- | :--- | :--- |
+| **Usuário NÃO curtiu o vídeo** | Clicar "Like" 1x | Contador incrementa +1 (curtida registrada) |
+| **Usuário JÁ curtiu o vídeo** | Clicar "Like" 1x | Contador decrementa -1 (unlike / remoção) |
+| **Usuário NÃO curtiu o vídeo** | Clicar "Like" 10x rápido | Contador final deve ser apenas +1 (debounce/lock) |
+| **Usuário NÃO está logado** | Clicar "Like" | Ação bloqueada ou redirecionamento para login |
 
-- **O que ele afeta:** Experiência do usuário na organização de playlists.
-- **Sua Gravidade:** Baixo
-- **Como reproduzir:** Adicione o mesmo vídeo à mesma playlist duas vezes. Abra a playlist e observe que o vídeo aparece duplicado na listagem.
-- **Impacto:** Playlists ficam com itens duplicados, gerando confusão visual e contagem incorreta de vídeos na playlist.
-- **Categoria:** Funcional
-- **Sistema Referência:** Módulo de Playlists
+---
 
-#### **R-19\. Streaming de vídeo sem suporte a HTTP Range (206)**
+### **5.4. Controle de Acesso — Tabela de Decisão**
+**Riscos cobertos:** R-06 (admin exposto), R-01 (auth)
 
-- **Como ocorre:** O endpoint de streaming usa `res.sendFile` que envia o arquivo inteiro com status 200, sem implementar o header `Range` e resposta parcial 206.
+**Regra:** O painel `/admin` só deve ser acessível por usuários autenticados E com role "admin". Usuários comuns e visitantes anônimos devem ser barrados.
 
-```js
-const streamVideo = (req, res) => {
-	const videoPath = `uploads/videos/${req.params.filename}`;
-	// Deveria verificar req.headers.range e responder com 206 Partial Content
-	res.sendFile(path.resolve(videoPath));
-};
-```
+| Condições \ Ações | R1 | R2 | R3 | R4 |
+| :--- | :--- | :--- | :--- | :--- |
+| **Usuário está autenticado?** | S | S | N | N |
+| **Usuário possui role "admin"?** | S | N | S | N |
+| **Ação: Permitir acesso ao `/admin`** | Sim | Não | Não | Não |
+| **Ação: Retornar erro 403/redirect** | Não | Sim | Sim | Sim |
 
-- **O que ele afeta:** Eficiência de rede e experiência de reprodução.
-- **Sua Gravidade:** Alto
-- **Como reproduzir:** Abra um vídeo de 50MB e tente pular para 80% da timeline. Observe no DevTools (aba Network) que o servidor reenvia o arquivo completo em vez de apenas o trecho solicitado.
-- **Impacto:** Cada seek no player baixa o vídeo inteiro novamente, consumindo banda excessiva e causando buffering desnecessário, especialmente em conexões lentas.
-- **Categoria:** Técnico / Performance
-- **Sistema Referência:** Endpoint de Streaming de Vídeo
+---
 
-#### **R-20\. Visualizações contam no hover sem reprodução efetiva**
+### **5.5. Sanitização de Comentários (XSS) — Particionamento de Equivalência**
+**Risco coberto:** R-07 (injeção de script)
 
-- **Como ocorre:** O evento de incremento de views é disparado no carregamento da thumbnail ou hover, e não no início efetivo da reprodução do vídeo.
+**Regra:** Todo texto inserido em comentários deve ser exibido como texto plano (string), nunca interpretado como HTML ou JavaScript pelo navegador.
 
-```js
-const onVideoLoad = async (videoId) => {
-	// Dispara no hover/thumbnail load em vez de no evento 'play' do player
-	await Video.increment('views', { where: { id: videoId } });
-};
-```
+| Tipo de Input | Classe | Resultado Esperado |
+| :--- | :--- | :--- |
+| Texto comum ("Ótimo vídeo!") | Válida | Exibido normalmente no DOM |
+| Tag HTML (`<b>negrito</b>`) | Inválida (potencial) | Exibido como texto literal: `<b>negrito</b>` |
+| Script malicioso (`<script>alert(1)</script>`) | Inválida (ataque) | Exibido como string pura, sem execução |
+| Event handler (`<img onerror=alert(1)>`) | Inválida (ataque) | Tag renderizada como texto, sem disparar evento |
+| String vazia ("") | Inválida | Comentário bloqueado ou ignorado pelo form |
 
-- **O que ele afeta:** Veracidade das métricas de visualização.
-- **Sua Gravidade:** Médio
-- **Como reproduzir:** Faça scroll pelo feed sem clicar em nenhum vídeo. Verifique no banco que os contadores de views dos vídeos que apareceram na tela foram incrementados.
-- **Impacto:** Métricas de visualização ficam massivamente infladas, prejudicando a análise de engajamento real e distorcendo o algoritmo de recomendação.
-- **Categoria:** Funcional / Negócio
-- **Sistema Referência:** Contagem de Views / Algoritmo de Relevância
+---
 
-#### **R-21\. Deleção de usuário deixa dados órfãos no banco**
+### **5.6. Visibilidade do Feed — Tabela de Decisão**
+**Riscos cobertos:** R-09 (fallback), R-12 (privacidade)
 
-- **Como ocorre:** Ao deletar um usuário pelo painel admin, apenas o registro na tabela `Users` é removido, sem cascade para vídeos, likes, comentários e arquivos em disco.
+**Regra:** Um vídeo só deve aparecer no feed se: (1) O vídeo for público, OU (2) O vídeo for privado mas o visualizador for o próprio dono.
 
-```js
-const deleteUser = async (req, res) => {
-	// Falta: ON DELETE CASCADE ou deleção manual dos relacionamentos
-	await User.destroy({ where: { id: req.params.id } });
-	// Vídeos, likes, comentários e arquivos do usuário ficam órfãos
-	res.json({ success: true });
-};
-```
+| Condições (S/N) \ Ações | R1 | R2 | R3 | R4 |
+| :--- | :--- | :--- | :--- | :--- |
+| **O Vídeo é Público?** | S | S | N | N |
+| **O Visualizador é o Dono?** | S | N | S | N |
+| **Ação: Exibir Vídeo no Feed** | Sim | Sim | Sim | Não |
+| **Ação: Ocultar Vídeo** | Não | Não | Não | Sim |
 
-- **O que ele afeta:** Integridade referencial do banco e consumo de disco.
-- **Sua Gravidade:** Crítico
-- **Como reproduzir:** Pelo painel administrativo, delete um usuário que tenha vídeos publicados. Verifique que os vídeos dele ainda existem na tabela `Videos` e os arquivos permanecem em `uploads/videos/`.
-- **Impacto:** O banco acumula registros órfãos (vídeos sem dono, likes sem referência) e o disco mantém GBs de arquivos inacessíveis, gerando inconsistência e desperdício de recursos.
-- **Categoria:** Não-Funcional (Integridade)
-- **Sistema Referência:** Painel Administrativo / Modelo de Dados (CASCADE)
+---
 
-## **5\. Recursos e Ambiente**
+## **6. Casos de Teste Planejados (Manuais)**
 
-- **Ambiente:** Node.js 20+, MySQL local, Vitest + Supertest
-- **Dados de teste:** Mock de usuários em arquivos `.json` e vídeos falsos para validação do multer criados.
-- **CI:** GitHub Actions (npm test em cada push)
+Abaixo estão listados os 12 casos de teste (1:1 com cada Risco catalogado), derivados diretamente das modelagens Black-Box da seção anterior.
 
-## **6\. Critérios de Entrada e Saída**
+| ID | Título (Risco) | Modelagem (Seção) | Pré-condições | Passos | Resultado Esperado |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **CT-01** | Senha sem criptografia no BD (R-01) | 5.4 Tabela Decisão | Conta recém criada "testH" | 1. Registrar usuário; 2. Consultar coluna `password` no MySQL | Valor da coluna deve ser hash bcrypt, não texto plano |
+| **CT-02** | Upload de arquivo proibido (R-02) | 5.1 Particionamento | Tela upload visível | 1. Selecionar "script.exe"; 2. Enviar via form | Erro 400: "Tipo de arquivo não suportado" |
+| **CT-03** | Banco de dados indisponível (R-03) | N/A | MySQL desligado | 1. Acessar a Home `/` | Tela "500: Tente novamente mais tarde" sem crash |
+| **CT-04** | E-mail inválido no cadastro (R-04) | 5.2 Particionamento | Tela `/register` | 1. Inserir email "teste123"; 2. Cadastrar | Erro: "Formato de e-mail inválido" |
+| **CT-05** | Curtida duplicada / Race (R-05) | 5.3 Particionamento | Logado no feed | 1. Clicar 10x rápido no "Like" de um vídeo | Contador registra apenas +1 curtida |
+| **CT-06** | Acesso indevido ao Admin (R-06) | 5.4 Tabela Decisão | Logado como user comum | 1. Acessar `/admin` pela barra de URL | Status HTTP 403 Forbidden |
+| **CT-07** | Injeção XSS em comentário (R-07) | 5.5 Particionamento | Vídeo aberto, caixa de comentário | 1. Digitar `<script>alert(1)</script>`; 2. Postar | Texto exibido como string pura, sem executar |
+| **CT-08** | Vídeo > 60s aceito (R-08) | 5.1 Valor-Limite | Tela de upload | 1. Selecionar MP4 de 90s; 2. Enviar form | Erro: "Duração máxima permitida: 60s" |
+| **CT-09** | Feed vazio para novo usuário (R-09) | 5.6 Tabela Decisão | Conta nova, segue 0 pessoas | 1. Acessar `/home` | Exibe vídeos globais populares (não vazio) |
+| **CT-10** | Upload de foto de perfil gigante (R-10) | 5.1 Valor-Limite | Tela editar perfil | 1. Subir imagem .tiff >30MB; 2. Enviar | Erro JSON "Payload Too Large" sem timeout |
+| **CT-11** | Senha curta aceita no cadastro (R-11) | 5.2 Valor-Limite | Tela `/register` | 1. Inserir senha "123"; 2. Cadastrar | Erro: "Senha deve ter no mínimo 8 caracteres" |
+| **CT-12** | Vídeo privado exposto (R-12) | 5.6 Tabela Decisão | User "A" posta privado; "B" online | 1. "B" acessa perfil de "A" | Vídeo privado de "A" não aparece para "B" |
 
-- **Entrada:** Ambiente configurado + migration ok + build passando
-- **Saída:** Cobertura >= 70% + zero falhas em riscos Críticos/Altos
-- **Suspensão:** Falha grave no ambiente que impede execução dos testes, como falha de persistência no MySQL de testes.
+## **7. Recursos e Ambiente**
+
+* **Ambiente de Teste:** Node.js v20+, MySQL Local Database configurado, Vitest Framework + `Supertest`.
+* **Massa de Dados Mock:** Usuários criados localmente em `fixtures` e arquivos limpos MP4 p/ validar Multer de forma simulada.
+* **Pipeline / CI:** Integração Contínua com GitHub Actions garantindo a validação (`npm test`) sem bloquear PR`s.
+
+## **8. Critérios de Aceitação**
+
+### **8.1. Critérios de Entrada**
+As atividades rigorosas de teste descritas na estratégia só vão iniciar e prosseguir quando cumprirem estas normas:
+* Os módulos bases previstos pro MVP estarem desenvolvidos e acessíveis localmente (Banco limpo + Migrations e Seeds em stand-by).
+* Execuções brutas manuais não crasharem (Ex: Iniciar a compilação do backend via index.js e exibir `Running at Port 3000`).
+* Requisitos e modelos documentados estarem aprovados pela banca de projeto.
+
+### **8.2. Critérios de Saída**
+Os testes estarão categoricamente concluídos quando atingirem os pontos chaves de qualidade estipulada pela Pirâmide:
+* **Cobertura (Coverage):** Evidenciar via c8 que as validações e testes unitários das principais rotas batem em percentual estipulado (`>= 70%`).
+* **Segurança e Regras Férreas:** Zero Falhas nos riscos definidos como **Críticos** e **Altos** (Sanitização e Autenticação).
+* **Validação Empírica Exímia:** Passos e Execuções dos 12 Casos de Teste (Black-Box Manuais mapeados em 1:1) gerando 100% de status verde.
+
+### **8.3. Critérios de Suspensão**
+Os desenvolvedores e QAs vão isolar e recuar a branch alvo, parando as sequências do plano quando:
+* Bloqueios no banco local destruírem a constância (Queries impedindo manipulações centrais de persistência).
+* Falhas e Exception nas dependências core (O módulo central do Router/Multer falhando sistematicamente e inviabilizando testes E2E).

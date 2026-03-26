@@ -5,14 +5,17 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const flash = require('connect-flash');
 const session = require('express-session');
+var expressLayouts = require('express-ejs-layouts');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usersRouter = require('./modules/user/userRoutes');
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views/pages'));
+app.set('layout', path.join(__dirname, 'views/layouts/main'));
+app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
@@ -30,6 +33,7 @@ app.use(
 app.use(flash());
 app.use((req, res, next) => {
 	res.locals.messages = req.flash();
+	res.locals.user = req.session.user || null;
 	next();
 });
 
@@ -37,7 +41,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

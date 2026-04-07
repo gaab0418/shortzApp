@@ -61,6 +61,7 @@ app.use(function (err, req, res, next) {
 
 const sequelize = require('./config/database');
 const User = require('./modules/user/userModel');
+const Seed = require('./config/seed');
 
 sequelize
 	.authenticate()
@@ -71,6 +72,8 @@ sequelize
 	.sync({ alter: true })
 	.then(() => console.log('Banco sincronizado'))
 	.catch((err) => console.error('Erro no banco: ', err));
+
+Seed.seed();
 
 console.log('---===========================---');
 

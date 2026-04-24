@@ -9,6 +9,7 @@ var expressLayouts = require('express-ejs-layouts');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./modules/user/userRoutes');
+var videoRoutes = require("./modules/video/videoRoutes"); // [ADICIONAR] Importa as rotas de vídeo
 
 var app = express();
 
@@ -42,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
+app.use("/", videoRoutes); // [ADICIONAR] Usa as rotas de vídeo
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -61,6 +63,7 @@ app.use(function (err, req, res, next) {
 
 const sequelize = require('./config/database');
 const User = require('./modules/user/userModel');
+const Video = require("./modules/video/videoModel"); // [ADICIONAR] Importa o modelo Video
 
 sequelize
 	.authenticate()

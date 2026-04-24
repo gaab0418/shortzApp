@@ -1,90 +1,27 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
 
-const User = sequelize.define(
-	'User',
-	{
-		id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true,
-			field: 'id'
-		},
-		username: {
-			type: DataTypes.STRING(60),
-			allowNull: false,
-			unique: true,
-			field: 'username'
-		},
-		email: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			unique: true,
-			validate: { isEmail: true },
-			field: 'email'
-		},
-		password: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			field: 'password'
-		},
-		fullName: {
-			type: DataTypes.STRING(120),
-			allowNull: false,
-			field: 'fullName'
-		},
-		profilePicture: {
-			type: DataTypes.STRING,
-			allowNull: true,
-			field: 'profilePicture'
-		},
-		bio: {
-			type: DataTypes.TEXT,
-			allowNull: true,
-			validate: {
-				len: [0, 500]
-			},
-			field: 'bio'
-		},
-		phone: {
-			type: DataTypes.STRING(20),
-			allowNull: true,
-			field: 'phone'
-		},
-		followersCount: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
-			field: 'followersCount'
-		},
-		followingCount: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
-			field: 'followingCount'
-		},
-		videosCount: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
-			field: 'videosCount'
-		},
-		isBlocked: {
-			type: DataTypes.BOOLEAN,
-			defaultValue: false,
-			field: 'isBlocked'
-		},
-		isDeleted: {
-			type: DataTypes.BOOLEAN,
-			defaultValue: false,
-			field: 'isDeleted'
-		},
-		isAdmin: {
-			type: DataTypes.BOOLEAN,
-			defaultValue: false,
-			field: 'isAdmin'
-		}
-	},
-	{
-		tableName: 'users'
-	}
+const User = sequelize.define('User',
+    {
+        id:             { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        username:       { type: DataTypes.STRING, allowNull: false, unique: 'idx_unique_username' },
+        email:          { type: DataTypes.STRING, allowNull: false, unique: 'idx_unique_email', validate: { isEmail: true } },
+        password:       { type: DataTypes.STRING, allowNull: false },
+        fullName:       { type: DataTypes.STRING, allowNull: true },
+        bio:            { type: DataTypes.STRING(255), allowNull: true },
+        profilePicture: { type: DataTypes.STRING, allowNull: true, defaultValue: 'default-profile.png' },
+        videosCount:    { type: DataTypes.INTEGER, defaultValue: 0 },
+        isBlocked:      { type: DataTypes.BOOLEAN, defaultValue: false },
+        isAdmin:        { type: DataTypes.BOOLEAN, defaultValue: false }
+    },
+    {
+        timestamps: true,
+        tableName: 'users',
+        indexes: [
+            { unique: true, fields: ['username'], name: 'idx_unique_username' },
+            { unique: true, fields: ['email'], name: 'idx_unique_email' }
+        ]
+    }
 );
 
 module.exports = User;

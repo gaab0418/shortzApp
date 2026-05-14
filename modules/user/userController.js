@@ -2,6 +2,7 @@ const User = require('./userModel');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const Video = require("../video/videoModel");
 
 exports.register = async (req, res) => {
 	const { username, email, password, confirmPassword, fullName } = req.body;
@@ -101,6 +102,36 @@ exports.getProfile = async (userId) => {
 		console.error(error);
 		throw new Error('Erro ao buscar perfil do usuário.');
 	}
+};
+
+exports.renderPublicProfile = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const user = await User.findOne({
+            where: { username },
+            include: [{
+                model: Video,
+                attributes: ["id", "title", "thumbnailPath", "views"],
+                order: [["createdAt", "DESC"]]
+            }],
+            attributes: ["id", "username", "fullName", "bio", "profilePicture", "followersCount", "followingCount", "videosCount"]
+        });
+
+        if (!user) {
+            req.flash("error", "Usuário não encontrado.");
+            return res.redirect("/feed");
+        }
+
+        // Verifica se o perfil sendo visualizado é o do usuário logado
+        const isOwner = req.session.user && req.session.user.id === user.id;
+
+        res.render("profile", { title: `@${user.username} | Shortz-App`, profileUser: user, isOwner });
+
+    } catch (error) {
+        console.error("Erro ao carregar perfil público:", error);
+        req.flash("error", "Erro ao carregar o perfil. Tente novamente.");
+        res.redirect("/feed");
+    }
 };
 
 exports.updateProfile = async (req, res) => {

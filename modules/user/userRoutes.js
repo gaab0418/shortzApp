@@ -51,4 +51,7 @@ router.post(
 	userController.updateProfile
 );
 
+// Rota para exibir o perfil público de um usuário
+router.get("/profile/:username", userController.renderPublicProfile);
+
 module.exports = router;

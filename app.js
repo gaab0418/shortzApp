@@ -61,9 +61,9 @@ app.use(function (err, req, res, next) {
 	res.render('error');
 });
 
+require("./config/associations");
+
 const sequelize = require('./config/database');
-const User = require('./modules/user/userModel');
-const Video = require("./modules/video/videoModel"); // [ADICIONAR] Importa o modelo Video
 
 sequelize
 	.authenticate()

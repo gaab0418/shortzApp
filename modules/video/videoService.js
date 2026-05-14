@@ -29,7 +29,6 @@ async function streamVideo(videoId) {
     throw new Error("Vídeo não encontrado.");
   }
 
-  await video.increment("views");
   return video;
 }
 
@@ -62,6 +61,9 @@ async function getVideoDetails(videoId, currentUserId = null) {
   if (!video) {
     throw new Error("Vídeo não encontrado.");
   }
+
+  await video.increment("views");
+  video.views += 1;
 
   let isLiked = false;
   if (currentUserId) {

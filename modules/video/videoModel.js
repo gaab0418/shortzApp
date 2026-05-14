@@ -3,13 +3,15 @@ const sequelize = require("../../config/database");
 
 const Video = sequelize.define("Video", 
     {
-        id:            { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        title:         { type: DataTypes.STRING(255), allowNull: false },
-        description:   { type: DataTypes.TEXT, allowNull: true },
-        videoPath:     { type: DataTypes.STRING(255), allowNull: false },
-        thumbnailPath: { type: DataTypes.STRING(255), allowNull: false },
-        views:         { type: DataTypes.INTEGER, defaultValue: 0 },
-        userId:        { type: DataTypes.INTEGER, allowNull: false, references: { model: "users", key: "id" } } 
+        id:             { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        title:          { type: DataTypes.STRING(255), allowNull: false },
+        description:    { type: DataTypes.TEXT, allowNull: true },
+        videoPath:      { type: DataTypes.STRING(255), allowNull: false },
+        thumbnailPath:  { type: DataTypes.STRING(255), allowNull: false },
+        views:          { type: DataTypes.INTEGER, defaultValue: 0 },
+        userId:         { type: DataTypes.INTEGER, allowNull: false, references: { model: "users", key: "id" } }, 
+        likesCount:     { type: DataTypes.INTEGER, defaultValue: 0 },
+        commentsCount:  { type: DataTypes.INTEGER, defaultValue: 0 }
     }, 
     {
         tableName: "videos",

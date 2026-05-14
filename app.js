@@ -9,6 +9,9 @@ var expressLayouts = require('express-ejs-layouts');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./modules/user/userRoutes');
+var videoRoutes = require("./modules/video/videoRoutes");
+var likeRoutes = require("./modules/like/likeRoutes");
+var commentRoutes = require("./modules/comment/commentRoutes"); 
 
 var app = express();
 
@@ -42,6 +45,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', usersRouter);
+app.use("/", videoRoutes);
+app.use("/", likeRoutes);
+app.use("/", commentRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -59,9 +65,9 @@ app.use(function (err, req, res, next) {
 	res.render('error');
 });
 
+require("./config/associations");
+
 const sequelize = require('./config/database');
-const User = require('./modules/user/userModel');
-const Seed = require('./config/seed');
 
 sequelize
 	.authenticate()

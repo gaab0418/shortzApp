@@ -17,82 +17,42 @@
 			</div>
 
 			<div class="row g-4">
-				<!-- Video Card 1 -->
-				<div class="col-6 col-md-4 col-lg-3">
-					<div class="video-card">
-						<div class="thumbnail-placeholder">
-							<i class="bi bi-play-circle play-icon"></i>
-							<span class="badge-views"
-								><i class="bi bi-eye"></i> 1.2k</span
-							>
-						</div>
-						<div class="p-3">
-							<h6 class="text-truncate mb-1">
-								Como fazer Café Gelado
-							</h6>
-							<div class="d-flex align-items-center">
-								<span class="text-muted small"
-									>@cafe_master</span
-								>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Video Card 2 -->
-				<div class="col-6 col-md-4 col-lg-3">
-					<div class="video-card">
-						<div class="thumbnail-placeholder">
-							<i class="bi bi-play-circle play-icon"></i>
-							<span class="badge-views"
-								><i class="bi bi-eye"></i> 850</span
-							>
-						</div>
-						<div class="p-3">
-							<h6 class="text-truncate mb-1">
-								Dica de Node.js #01
-							</h6>
-							<span class="text-muted small">@dev_junior</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Video Card 3 -->
-				<div class="col-6 col-md-4 col-lg-3">
-					<div class="video-card">
-						<div class="thumbnail-placeholder">
-							<i class="bi bi-play-circle play-icon"></i>
-							<span class="badge-views"
-								><i class="bi bi-eye"></i> 2.5k</span
-							>
-						</div>
-						<div class="p-3">
-							<h6 class="text-truncate mb-1">
-								Setup Minimalista 2026
-							</h6>
-							<span class="text-muted small">@tech_lover</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Video Card 4 -->
-				<div class="col-6 col-md-4 col-lg-3">
-					<div class="video-card">
-						<div class="thumbnail-placeholder">
-							<i class="bi bi-play-circle play-icon"></i>
-							<span class="badge-views"
-								><i class="bi bi-eye"></i> 3.1k</span
-							>
-						</div>
-						<div class="p-3">
-							<h6 class="text-truncate mb-1">
-								Viagem rápida: Japão
-							</h6>
-							<span class="text-muted small">@travel_vlog</span>
-						</div>
-					</div>
-				</div>
-			</div>
+                <% if (videos && videos.length > 0) { %>
+                    <% videos.forEach(video => { %>
+                        <!-- Video Card -->
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="video-card">
+                                <a href="/video/<%= video.id %>">
+                                    <div class="thumbnail-placeholder" 
+style="background-image: url('/uploads/covers/<%= video.thumbnailPath %>');">
+                                        <i class="bi bi-play-circle play-icon"></i>
+                                        <span class="badge-views"><i class="bi bi-eye"></i> <%= video.views %></span>
+                                    </div>
+                                </a>
+                                <div class="p-3">
+                                    <h6 class="text-truncate mb-1"><a href="/video/<%= video.id %>" 
+class="text-decoration-none text-dark"><%= video.title %></a></h6>
+                                    <div class="d-flex align-items-center">
+                                        <a href="/profile/<%= video.User.username %>" class="d-flex align-items-center text-decoration-none">
+                                            <img src="<%= video.User.profilePicture ? 
+                                                '/uploads/profiles/' + video.User.profilePicture : 
+                                                '/images/default-profile.png' %>" 
+                                                alt="<%= video.User.username %>" class="rounded-circle me-2" width="24" height="24">
+                                            <span class="text-muted small">@<%= video.User.username %></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <div class="col-12">
+                        <div class="alert alert-info text-center" role="alert">
+                            Nenhum vídeo disponível no momento. Seja o primeiro a enviar um!
+                        </div>
+                    </div>
+                <% } %>
+            </div>
 
 			<!-- Botão Carregar Mais -->
 			<div class="text-center mt-5">

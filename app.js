@@ -79,8 +79,6 @@ sequelize
 	.then(() => console.log('Banco sincronizado'))
 	.catch((err) => console.error('Erro no banco: ', err));
 
-Seed.seed();
-
 console.log('---===========================---');
 
 module.exports = app;
